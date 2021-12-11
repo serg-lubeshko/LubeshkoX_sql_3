@@ -2,6 +2,9 @@ db_config = {
     'mysql':{
         'host': 'localhost',
         'user': 'root',
-        'pass': '2278'
+        'pass': 'Z3143155',
+
     }
 }
+
+
