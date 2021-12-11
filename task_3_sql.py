@@ -8,4 +8,4 @@ def open_file(files):
     with open(file_path, 'r') as fi:
         return json.load(fi)
 
-print(list(open('students.json')))
+# print(list(open('students.json')))

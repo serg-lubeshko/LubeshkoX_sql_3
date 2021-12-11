@@ -3,12 +3,14 @@ from ExecutionСommands import ExecDb
 
 
 # !!!! РАЗДЕЛИТЬ ПОТОМ НА КЛАССЫ
-# 1.Коннект
-# 2.Содать табл
-# 3. Insert data
-# -open.file
+# 1.Коннект+
+# 2.Содать табл+
+# 3. Insert data+
+# -open.file ???????
 # 4. Select
 # 5. upload result
+from task_3_sql import open_file
+
 
 class InterfaceDb:
 
@@ -27,8 +29,16 @@ class InterfaceDb:
         for item_table in ExecDb.create_tables(self.db_name):
             self._cursor.execute(item_table)
 
-    def insert_data(self):
-        pass
+    def insert_data_rooms(self,rooms):
+
+        self._cursor.executemany(ExecDb.insert_datas_rooms(self.db_name),rooms)
+        self.connector.commit()
+        print('Insert rooms')
+
+    def insert_data_students(self,students):
+        self._cursor.executemany(ExecDb.insert_datas_students(self.db_name), students)
+        self.connector.commit()
+        print('Insert students')
 
     #     # self._cursor.execute(ExecDb.drop_db(db_name))
     #     with self._cursor:
@@ -79,7 +89,16 @@ if __name__ == '__main__':
     a = InterfaceDb()
     a.create_db()
     a.create_table()
-    # a.drop_db()
+
+    students_file=open_file('students.json')
+    rooms_file = open_file('rooms.json')
+
+    insert_room = [(id,name) for id, name in (item.values() for item in rooms_file)]
+    insert_student=[(id,birth,name,room,sex) for id,birth,name,room,sex in (item.values() for item in students_file)]
+    # print(aaa)
+    a.insert_data_rooms(insert_room)
+    a.insert_data_students(insert_student)
+      # a.drop_db()
     # d=a.create_connection_mysql_db('test1').cursor()
     # d.execute("SELECT * FROM room")
 
