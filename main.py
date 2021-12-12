@@ -1,14 +1,13 @@
-from connect_commands import ConnectCreate
 from ExecutionСommands import ExecDb
-
-
+from connect_commands import ConnectCreate
 # !!!! РАЗДЕЛИТЬ ПОТОМ НА КЛАССЫ
-# 1.Коннект+
-# 2.Содать табл+
-# 3. Insert data+
-# -open.file ???????
+# 1.Коннект
+# 2.Содать табл
+# 3. Insert data
+# -open.file
 # 4. Select
 # 5. upload result
+from save_result import SaveResultJsonXml
 from task_3_sql import open_file
 
 
@@ -33,12 +32,42 @@ class InterfaceDb:
 
         self._cursor.executemany(ExecDb.insert_datas_rooms(self.db_name),rooms)
         self.connector.commit()
-        print('Insert rooms')
+        print('insert rooms')
 
     def insert_data_students(self,students):
-        self._cursor.executemany(ExecDb.insert_datas_students(self.db_name), students)
+        for student in students:
+            self._cursor.execute(ExecDb.insert_datas_students(self.db_name),(
+                student['id'],
+                student['birthday'],
+                student['name'],
+                student['room'],
+                student['sex']))
+        # self._cursor.executemany(ExecDb.insert_datas_students(self.db_name), students)
         self.connector.commit()
-        print('Insert students')
+        print('insert students')
+
+    def count_students_in_room(self):
+        text_file_res = 'AmountStudentInRoom'
+
+        self._cursor.execute(ExecDb.count_students_in_room(self.db_name))
+        head=self._cursor.description
+        result = self._cursor.fetchall()
+
+        SaveResultJsonXml.dictfetchall(head, result, text_file_res)
+
+
+
+
+        # head=self._cursor.description
+        # print(head, 'lllllllllll')
+
+        # res= ExecDb.dictfetchall(self._cursor.execute(ExecDb.count_students_in_room(self.db_name)))
+        # res=self._cursor.description
+        # print([dict(zip_longest([col[0] for col in res], row)) for row in self._cursor.fetchall()])
+        # print(res)
+        # for i in res:
+        #     print(i)
+
 
     #     # self._cursor.execute(ExecDb.drop_db(db_name))
     #     with self._cursor:
@@ -94,10 +123,11 @@ if __name__ == '__main__':
     rooms_file = open_file('rooms.json')
 
     insert_room = [(id,name) for id, name in (item.values() for item in rooms_file)]
-    insert_student=[(id,birth,name,room,sex) for id,birth,name,room,sex in (item.values() for item in students_file)]
+    # insert_student=[(id,birth,name,room,sex) for id,birth,name,room,sex in (item.values() for item in students_file)]
     # print(aaa)
     a.insert_data_rooms(insert_room)
-    a.insert_data_students(insert_student)
+    a.insert_data_students(students_file)
+    a.count_students_in_room()
       # a.drop_db()
     # d=a.create_connection_mysql_db('test1').cursor()
     # d.execute("SELECT * FROM room")

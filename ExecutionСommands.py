@@ -28,9 +28,16 @@ class ExecDb:
 
     @staticmethod
     def insert_datas_rooms(db_name):
-
         return f"INSERT IGNORE INTO {db_name}.rooms(`id`, `name`) VALUES(%s, %s)"
 
     @staticmethod
     def insert_datas_students(db_name):
         return f"INSERT IGNORE INTO {db_name}.students(`id`, `birthday`, `name`, `room`, `sex`) VALUES(%s, %s, %s, %s, %s)"
+
+    @staticmethod
+    def count_students_in_room(db_name):
+        return f''' SELECT r.id, r.name, COUNT(s.id) count
+                    FROM {db_name}.rooms r
+                        left JOIN {db_name}.students s ON r.id = s.room
+                        group by  r.id
+        '''
