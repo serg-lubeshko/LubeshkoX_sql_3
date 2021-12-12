@@ -1,5 +1,7 @@
 from ExecutionСommands import ExecDb
 from connect_commands import ConnectCreate
+from argpase_work import Argpase
+
 # !!!! РАЗДЕЛИТЬ ПОТОМ НА КЛАССЫ
 # 1.Коннект
 # 2.Содать табл
@@ -9,6 +11,7 @@ from connect_commands import ConnectCreate
 # 5. upload result
 from save_result import SaveResultJsonXml
 from task_3_sql import open_file
+import argparse
 
 
 class InterfaceDb:
@@ -16,7 +19,7 @@ class InterfaceDb:
     def __init__(self, db_name="task_3"):
         self.connector = ConnectCreate.connection_db()
         self._cursor = self.connector.cursor()
-        self.db_name=db_name
+        self.db_name = db_name
 
     def create_db(self):
         self._cursor.execute(ExecDb.create_db(self.db_name))
@@ -28,15 +31,15 @@ class InterfaceDb:
         for item_table in ExecDb.create_tables(self.db_name):
             self._cursor.execute(item_table)
 
-    def insert_data_rooms(self,rooms):
+    def insert_data_rooms(self, rooms):
 
-        self._cursor.executemany(ExecDb.insert_datas_rooms(self.db_name),rooms)
+        self._cursor.executemany(ExecDb.insert_datas_rooms(self.db_name), rooms)
         self.connector.commit()
         print('insert rooms')
 
-    def insert_data_students(self,students):
+    def insert_data_students(self, students):
         for student in students:
-            self._cursor.execute(ExecDb.insert_datas_students(self.db_name),(
+            self._cursor.execute(ExecDb.insert_datas_students(self.db_name), (
                 student['id'],
                 student['birthday'],
                 student['name'],
@@ -50,13 +53,10 @@ class InterfaceDb:
         text_file_res = 'AmountStudentInRoom'
 
         self._cursor.execute(ExecDb.count_students_in_room(self.db_name))
-        head=self._cursor.description
+        head = self._cursor.description
         result = self._cursor.fetchall()
 
         SaveResultJsonXml.dictfetchall(head, result, text_file_res)
-
-
-
 
         # head=self._cursor.description
         # print(head, 'lllllllllll')
@@ -67,7 +67,6 @@ class InterfaceDb:
         # print(res)
         # for i in res:
         #     print(i)
-
 
     #     # self._cursor.execute(ExecDb.drop_db(db_name))
     #     with self._cursor:
@@ -114,21 +113,35 @@ class InterfaceDb:
     # SELECT * FROM test.room
 
 
-if __name__ == '__main__':
+
+
+
+def main():
+    arg_parser = Argpase.work_argparse()
+    students_file=open_file(arg_parser.r_students)
+    rooms_file = open_file(arg_parser.r_rooms)
+
     a = InterfaceDb()
     a.create_db()
     a.create_table()
 
-    students_file=open_file('students.json')
-    rooms_file = open_file('rooms.json')
+if __name__ == '__main__':
+    main()
 
-    insert_room = [(id,name) for id, name in (item.values() for item in rooms_file)]
-    # insert_student=[(id,birth,name,room,sex) for id,birth,name,room,sex in (item.values() for item in students_file)]
-    # print(aaa)
-    a.insert_data_rooms(insert_room)
-    a.insert_data_students(students_file)
-    a.count_students_in_room()
-      # a.drop_db()
+    # a = InterfaceDb()
+    # a.create_db()
+    # a.create_table()
+    #
+    # students_file=open_file('students.json')
+    # rooms_file = open_file('rooms.json')
+    #
+    # insert_room = [(id,name) for id, name in (item.values() for item in rooms_file)]
+    # # insert_student=[(id,birth,name,room,sex) for id,birth,name,room,sex in (item.values() for item in students_file)]
+    # # print(aaa)
+    # a.insert_data_rooms(insert_room)
+    # a.insert_data_students(students_file)
+    # a.count_students_in_room()
+    # a.drop_db()
     # d=a.create_connection_mysql_db('test1').cursor()
     # d.execute("SELECT * FROM room")
 

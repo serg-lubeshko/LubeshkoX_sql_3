@@ -7,5 +7,3 @@ def open_file(files):
     file_path = os.path.join(script_dir, files)
     with open(file_path, 'r') as fi:
         return json.load(fi)
-
-# print(list(open('students.json')))
