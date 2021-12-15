@@ -1,4 +1,6 @@
-from ExecutionСommands import ExecDb
+from mysqlx import errors
+
+from conf.ExecutionСommands import ExecDb
 from conf.connect_commands import ConnectCreate
 from argpase_work import Argpase
 
@@ -9,8 +11,8 @@ from argpase_work import Argpase
 # -open.file
 # 4. Select
 # 5. upload result
-from conf.save_result import SaveResultJsonXml
 from task_3_sql import open_file
+from conf.save_result import save_result
 
 
 class InterfaceDb:
@@ -48,41 +50,37 @@ class InterfaceDb:
         self.connector.commit()
         print('insert students')
 
+    @save_result
     def count_students_in_room(self):
-        text_file_res = '1.AmountStudentInRoom'
+        # список комнат и количество студентов в каждой из них
 
+        text_file_res_name = '1.AmountStudentInRoom'
         self._cursor.execute(ExecDb.count_students_in_room(self.db_name))
-        head = self._cursor.description
-        result = self._cursor.fetchall()
+        return self._cursor, text_file_res_name
 
-        SaveResultJsonXml.dictfetchall(head, result, text_file_res)
-
+    @save_result
     def get_min_avg_age_top_5(self):
-        #top 5 комнат, где самые маленький средний возраст студентов
+        # top 5 комнат, где самые маленький средний возраст студентов
 
-        text_file_res = '2.Min_avg_age_top_5'
+        text_file_res_name = '2.Min_avg_age_top_5'
         self._cursor.execute(ExecDb.get_min_age_avg_top_5(self.db_name))
+        return self._cursor, text_file_res_name
 
-        head = self._cursor.description
-        result = self._cursor.fetchall()
-        SaveResultJsonXml.dictfetchall(head, result, text_file_res)
-
+    @save_result
     def get_room_delta_age_top5(self):
-        text_file_res = '3.Delta_max_age_top_5'
+        #top 5 комнат с самой большой разницей в возрасте студентов
+
+        text_file_res_name = '3.Delta_max_age_top_5'
         self._cursor.execute(ExecDb.get_room_delta_age_top5(self.db_name))
-        head = self._cursor.description
-        result = self._cursor.fetchall()
-        SaveResultJsonXml.dictfetchall(head, result, text_file_res)
+        return self._cursor, text_file_res_name
 
-
+    @save_result
     def get_room_dif_sex(self):
-        #список комнат где живут разнополые студенты
-        text_file_res = '4.RoomSexDif'
-        self._cursor.execute(ExecDb.get_room_sex_dif(self.db_name))
+        # список комнат где живут разнополые студенты
 
-        head = self._cursor.description
-        result = self._cursor.fetchall()
-        SaveResultJsonXml.dictfetchall(head, result, text_file_res)
+        text_file_res_name = '4.RoomSexDif'
+        self._cursor.execute(ExecDb.get_room_sex_dif(self.db_name))
+        return self._cursor, text_file_res_name
 
     def index_sql(self):
         self._cursor.execute(ExecDb.index_sql(self.db_name))
@@ -90,14 +88,14 @@ class InterfaceDb:
 
 def main():
     arg_parser = Argpase.work_argparse()
-    students_file=open_file(arg_parser.r_students)
+    students_file = open_file(arg_parser.r_students)
     rooms_file = open_file(arg_parser.r_rooms)
 
     a = InterfaceDb()
     a.create_db()
     a.create_table()
 
-    insert_room = [(id,name) for id, name in (item.values() for item in rooms_file)]
+    insert_room = [(id, name) for id, name in (item.values() for item in rooms_file)]
     # insert_student=[(id,birth,name,room,sex) for id,birth,name,room,sex in (item.values() for item in students_file)]
     # print(aaa)
     a.insert_data_rooms(insert_room)
@@ -108,10 +106,11 @@ def main():
     a.get_room_delta_age_top5()
     a.get_room_dif_sex()
 
-    a.index_sql()
-    
+    # try:
+    #     a.index_sql()
+    # except errors.ProgrammingError:
+    #     print('Duplicate key name')
 
-    # a.get_room_dif_sex()
 
 
 if __name__ == '__main__':
@@ -136,8 +135,6 @@ if __name__ == '__main__':
 
     # cursor = a.create_connection_mysql_db('test1').cursor()
     # a.get_data_table_db()
-
-
 
 # - Сделать запросы к базе данных чтобы вернуть:
 # - список комнат и количество студентов в каждой из них

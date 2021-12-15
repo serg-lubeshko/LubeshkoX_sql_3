@@ -2,6 +2,14 @@ import json
 from dict2xml import dict2xml
 
 
+def save_result(f):
+    def wrapped(self,*args, **kwargs):
+        res, text_file_res = f(self, *args, **kwargs)
+        head = res.description
+        result = res.fetchall()
+        SaveResultJsonXml.dictfetchall(head, result, text_file_res)
+    return wrapped
+
 class SaveResultJsonXml:
     data = None
     file_text = None
@@ -13,14 +21,14 @@ class SaveResultJsonXml:
 
     @classmethod
     def save_xml(cls):
-        xml_data={'div':cls.data}
-        res= dict2xml(xml_data, wrap="main", indent=" ")
+        xml_data = {'div': cls.data}
+        res = dict2xml(xml_data, wrap="main", indent=" ")
         with open(f'{SaveResultJsonXml.file_text}.xml', 'w') as f:
             f.write(res)
 
     @staticmethod
     def dictfetchall(heads, rv, text):
-        print(heads)
+        # print(heads)
         row_headers = [x[0] for x in heads]
         json_data = []
         for result in rv:
@@ -30,4 +38,3 @@ class SaveResultJsonXml:
         SaveResultJsonXml.data = json_data
         SaveResultJsonXml.save()
         SaveResultJsonXml.save_xml()
-
