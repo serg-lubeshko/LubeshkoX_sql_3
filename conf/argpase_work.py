@@ -5,7 +5,6 @@ class Argpase():
 
     @staticmethod
     def work_argparse():
-        # python main.py -h
 
         parser = argparse.ArgumentParser()
 
@@ -18,6 +17,4 @@ class Argpase():
         print(args.r_students)
         print(args.r_rooms)
 
-        # Опциональные (можно использовать при выборе json or xml, выведу все. Есть choice, default, required=True )
-        parser.add_argument("-a", "--action", help='What do you want?)', required=True)
         return args

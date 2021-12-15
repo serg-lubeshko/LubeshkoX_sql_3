@@ -8,7 +8,7 @@ class ExecDb:
     @staticmethod
     def drop_db(db_name):
         print('DataBase Delete')
-        return f"DROP DATABASE IF EXISTS{db_name}"
+        return f"DROP DATABASE IF EXISTS {db_name}"
 
     @staticmethod
     def create_tables(db_name):
@@ -37,7 +37,6 @@ class ExecDb:
 
     @staticmethod
     def count_students_in_room(db_name):
-
         return f''' SELECT r.id, r.name,
         COUNT(s.id) AS count
         FROM {db_name}.rooms r
@@ -48,7 +47,6 @@ class ExecDb:
 
     @staticmethod
     def get_min_age_avg_top_5(db_name):
-
         return f'''SELECT r.id, r.name,
         CAST(AVG (year (CURRENT_TIMESTAMP) - year (s.birthday)) AS UNSIGNED) AS avg_age
         FROM {db_name}.rooms r JOIN {db_name}.students s ON r.id = s.room
@@ -58,7 +56,6 @@ class ExecDb:
 
     @staticmethod
     def get_room_delta_age_top5(db_name):
-
         return f'''SELECT r.id, r.name,
         (MAX(year(CURRENT_TIMESTAMP) - year(s.birthday))- MIN(year(CURRENT_TIMESTAMP) - year(s.birthday))) AS dif_age
         FROM {db_name}.rooms r JOIN {db_name}.students s ON r.id = s.room
@@ -68,7 +65,6 @@ class ExecDb:
 
     @staticmethod
     def get_room_sex_dif(db_name):
-
         return f'''SELECT r.id, r.name AS room,
         COUNT(DISTINCT s.sex) AS sex
         FROM {db_name}.rooms r INNER JOIN {db_name}.students s ON r.id = s.room
