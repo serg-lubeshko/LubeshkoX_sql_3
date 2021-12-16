@@ -3,7 +3,7 @@ import mysql
 from conf.argpase_work import Argpase
 from conf.ExecutionСommands import ExecDb
 from conf.connect_commands import ConnectCreate
-from conf.save_result import save_result
+from conf.save_result import  SaveResultJsonXml
 from conf.open_file import open_file
 
 
@@ -42,37 +42,49 @@ class InterfaceDb:
         self.connector.commit()
         print('insert students')
 
-    @save_result
+
     def count_students_in_room(self):
         # список комнат и количество студентов в каждой из них
 
         text_file_res_name = '1.AmountStudentInRoom'
         self._cursor.execute(ExecDb.count_students_in_room(self.db_name))
-        return self._cursor, text_file_res_name
 
-    @save_result
+        head = self._cursor.description
+        result = self._cursor.fetchall()
+        SaveResultJsonXml.dictfetchall(head, result, text_file_res_name)
+
+
     def get_min_avg_age_top_5(self):
         # top 5 комнат, где самые маленький средний возраст студентов
 
         text_file_res_name = '2.Min_avg_age_top_5'
         self._cursor.execute(ExecDb.get_min_age_avg_top_5(self.db_name))
-        return self._cursor, text_file_res_name
 
-    @save_result
+        head = self._cursor.description
+        result = self._cursor.fetchall()
+        SaveResultJsonXml.dictfetchall(head, result, text_file_res_name)
+
+
     def get_room_delta_age_top5(self):
         # top 5 комнат с самой большой разницей в возрасте студентов
 
         text_file_res_name = '3.Delta_max_age_top_5'
         self._cursor.execute(ExecDb.get_room_delta_age_top5(self.db_name))
-        return self._cursor, text_file_res_name
 
-    @save_result
+        head = self._cursor.description
+        result = self._cursor.fetchall()
+        SaveResultJsonXml.dictfetchall(head, result, text_file_res_name)
+
+
     def get_room_dif_sex(self):
         # список комнат где живут разнополые студенты
 
         text_file_res_name = '4.RoomSexDif'
         self._cursor.execute(ExecDb.get_room_sex_dif(self.db_name))
-        return self._cursor, text_file_res_name
+
+        head = self._cursor.description
+        result = self._cursor.fetchall()
+        SaveResultJsonXml.dictfetchall(head, result, text_file_res_name)
 
     def index_sql(self):
         self._cursor.execute(ExecDb.index_sql(self.db_name))
